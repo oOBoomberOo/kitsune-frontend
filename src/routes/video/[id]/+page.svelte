@@ -75,15 +75,37 @@
 	$: maxPages = data.records.page.totalPages;
 	$: params.page = Math.max(Math.min(params.page, maxPages), 1);
 
+	$: canStop = [`ACTIVE`, `SCHEDULED`].includes(video.status);
+	$: canRestart = [`COMPLETED`, `PANIC`].includes(video.status);
+
 	$: withQuery(params, { replaceState: true, keepFocus: true });
 
-	async function restartVideo(videoId: string) {
-		try {
-			await backend.restartVideo({ videoId: [videoId] });
-			await invalidateAll();
-		} catch (e) {
-			console.error(e);
-		}
+	let task: Promise<void> = Promise.resolve();
+
+	function stopVideo() {
+		const fn = async () => {
+			try {
+				await backend.stopVideo({ videoId: [video.id] });
+				await invalidateAll();
+			} catch (e) {
+				console.error(e);
+			}
+		};
+
+		task = fn();
+	}
+
+	function restartVideo() {
+		const fn = async () => {
+			try {
+				await backend.restartVideo({ videoId: [video.id] });
+				await invalidateAll();
+			} catch (e) {
+				console.error(e);
+			}
+		};
+
+		task = fn();
 	}
 </script>
 
@@ -147,6 +169,18 @@
 		<div class="container">
 			<section class="title"><a href="https://youtu.be/{video.id}">{video.title}</a></section>
 
+			<section class="control">
+				{#await task}
+					<button disabled>Stop</button>
+					<button disabled>Restart</button>
+				{:then _}
+					<button class="color-warning" disabled={!canStop} on:click={stopVideo}>Stop</button>
+					<button class="color-completed" disabled={!canRestart} on:click={restartVideo}
+						>Restart</button
+					>
+				{/await}
+			</section>
+
 			<section class="status {videoColor}">
 				<span class="badge">{video.status}</span>
 
@@ -165,12 +199,6 @@
 				{:else if video.status === 'PANIC'}
 					<p class="quoted-box">
 						<span>{video.panicMessage}</span>
-
-						<br /><br />
-
-						<button on:click={() => restartVideo(video.id)} class="restart-btn" type="button"
-							>Try restart?</button
-						>
 					</p>
 				{/if}
 			</section>
@@ -464,5 +492,31 @@
 		position: sticky;
 		top: 0;
 		bottom: 0;
+	}
+
+	.control {
+		& button {
+			padding: 5px 10px;
+			border-radius: 5px;
+			border: 1px solid var(--highlight-color);
+			background-color: rgba(from var(--highlight-color) r g b / 0.3);
+			color: var(--highlight-color);
+			text-shadow: 0px 0px px rgba(0, 0, 0, 0.25);
+
+			font-size: 14px;
+			font-weight: bold;
+
+			transition: 0.1s;
+
+			&:hover {
+				cursor: pointer;
+				background-color: rgba(from var(--highlight-color) r g b / 0.1);
+				transform: translateY(-3px);
+			}
+		}
+
+		& button:disabled {
+			--highlight-color: hsl(0, 0%, 50%);
+		}
 	}
 </style>
