@@ -4,50 +4,72 @@
 	import { fly } from 'svelte/transition';
 	import VideoPreview from '$lib/component/VideoPreview.svelte';
 	import Paginator from '$lib/component/Paginator.svelte';
+	import { withQuery } from '$lib/helper';
+	import { flip } from 'svelte/animate';
+	import { quintInOut } from 'svelte/easing';
 	export let data: PageData;
 
 	let page = 1;
 	let pageSize = 10;
 
-	$: content = data.videos.content!;
-
+	$: maxPage = data.videos.page.totalPages;
+	$: content = data.videos.content;
+	$: withQuery({ page, pageSize });
 </script>
 
-<div class="pagination">
-	<select bind:value={pageSize} name="pageSize" id="pageSize">
-		<option value={1}>1</option>
-		<option value={10} selected>10</option>
-		<option value={25}>25</option>
-		<option value={50}>50</option>
-		<option value={100}>100</option>
-	</select>
+<nav class="pagination">
+	<Paginator bind:page bind:maxPage />
 
-	<Paginator data={data.videos.page} bind:page />
-</div>
+	<div>
+		<select bind:value={pageSize} name="pageSize" id="pageSize">
+			<option value={1}>1</option>
+			<option value={10}>10</option>
+			<option value={25}>25</option>
+			<option value={50}>50</option>
+			<option value={100}>100</option>
+			<option value={0x7fffffff}>ALL</option>
+		</select>
+	</div>
+</nav>
 
 <div class="container">
-	{#each content as video, index}
-		<div in:fly={{ duration: 100 * index, x: 500 }}>
+	{#each content as video, index (video.id) }
+		<div animate:flip={{ delay: 250, duration: 250, easing: quintInOut }} transition:fly={{ x: '-100%' }}>
 			<VideoPreview data={video} />
 		</div>
 	{/each}
 </div>
 
 <style>
-    .pagination {
-        display: flex;
-        justify-content: center;
-        gap: 15px;
-    }
+	.pagination {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 15px;
 
-    .container {
-        display: grid;
+		& select {
+			padding: 5px 10px;
+			border-radius: 5px;
+			border: 1px solid hsl(0, 0%, 80%);
+			background-color: white;
+			color: hsl(0, 0%, 30%);
+			margin: 0 5px;
 
-        margin: 15px;
+			&:hover {
+				cursor: pointer;
+				background-color: hsl(0, 0%, 95%);
+			}
+		}
+	}
 
-        justify-content: center;
+	.container {
+		display: grid;
 
-        grid-template-columns: repeat(auto-fill, 200px);
-        gap: 15px;
-    }
+		margin: 15px;
+
+		justify-content: center;
+
+		grid-template-columns: repeat(auto-fill, 200px);
+		gap: 15px;
+	}
 </style>

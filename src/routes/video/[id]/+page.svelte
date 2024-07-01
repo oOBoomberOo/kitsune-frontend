@@ -5,11 +5,11 @@
 	import type { PageData } from './$types';
 	import type { Components } from '$lib/backend';
 
-	import { page as _page } from '$app/stores';
 	import { withQuery } from '$lib/helper';
 	import RecordChart from '$lib/component/RecordChart.svelte';
 	import { backend } from '$lib';
 	import { invalidateAll } from '$app/navigation';
+	import Paginator from '$lib/component/Paginator.svelte';
 
 	export let data: PageData;
 
@@ -72,14 +72,10 @@
 		interval: 1
 	};
 
-	$: isFirst = params.page <= 1;
-	$: isLast = params.page >= maxPages;
 	$: maxPages = data.records.page.totalPages;
-
 	$: params.page = Math.max(Math.min(params.page, maxPages), 1);
 
-	const searchParams = $_page.url.searchParams;
-	$: withQuery(searchParams, params, { replaceState: true });
+	$: withQuery(params, { replaceState: true, keepFocus: true });
 
 	async function restartVideo(videoId: string) {
 		try {
@@ -94,28 +90,7 @@
 <article>
 	<section class="record-list card">
 		<nav class="paginator">
-			<div class="page-filter">
-				<button on:click={() => (params.page = 1)} disabled={isFirst}>First</button>
-
-				<button on:click={() => params.page--} disabled={isFirst}>Prev</button>
-
-				<span class="page-selector">
-					<input
-						type="number"
-						name="page"
-						id="page"
-						bind:value={params.page}
-						min="1"
-						max={maxPages}
-					/>
-					/
-					<span>{maxPages}</span>
-				</span>
-
-				<button on:click={() => params.page++} disabled={isLast}>Next</button>
-
-				<button on:click={() => (params.page = maxPages)} disabled={isLast}>Last</button>
-			</div>
+			<Paginator bind:page={params.page} bind:maxPage={maxPages} />
 
 			<div class="size-filter">
 				<label for="size">Page Size</label>
@@ -234,13 +209,14 @@
 	article {
 		display: grid;
 		grid-template-columns: 2fr 1fr;
-		grid-template-rows: auto auto;
-		gap: 20px;
+		grid-template-rows: 1fr 1fr;
+		gap: var(--gap-size);
 
 		min-height: 0;
 		min-width: 0;
 
 		height: 100%;
+		box-sizing: border-box;
 	}
 
 	.card {
@@ -330,6 +306,7 @@
 		display: grid;
 		grid-template-columns: 1fr;
 		grid-template-rows: 250px 1fr;
+		height: fit-content;
 
 		& header {
 			height: 100%;
@@ -487,45 +464,5 @@
 		position: sticky;
 		top: 0;
 		bottom: 0;
-
-		& .page-selector {
-			display: flex;
-			gap: 3px;
-			justify-content: center;
-			align-items: center;
-
-			& input {
-				min-width: 1ch;
-
-				outline: none;
-				border: none;
-				border-bottom: 1px solid hsl(0, 0%, 40%);
-			}
-		}
-	}
-
-	.page-filter {
-		display: flex;
-		justify-content: center;
-		color: hsl(0, 0%, 50%);
-
-		& button {
-			padding: 5px 10px;
-			border-radius: 5px;
-			border: 1px solid hsl(0, 0%, 80%);
-			background-color: white;
-			color: hsl(0, 0%, 30%);
-			margin: 0 5px;
-
-			&:hover {
-				cursor: pointer;
-				background-color: hsl(0, 0%, 95%);
-			}
-
-			&:disabled {
-				cursor: not-allowed;
-				background-color: hsl(0, 0%, 95%);
-			}
-		}
 	}
 </style>

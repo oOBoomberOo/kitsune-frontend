@@ -33,7 +33,6 @@
 	$: {
 		if (chart) {
 			chart.data = computeDataSets(records);
-			console.log(chart.data);
 			chart.update();
 		}
 	}
@@ -64,12 +63,11 @@
 	});
 </script>
 
-<canvas bind:this={canvas}></canvas>
+<canvas bind:this={canvas} width="0" height="0"></canvas>
 
 <style>
 	canvas {
 		width: 100%;
-		height: auto;
-		aspect-ratio: 4 / 3;
+		height: 100%;
 	}
 </style>

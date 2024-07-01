@@ -9,13 +9,9 @@ export interface GotoOptions {
 	state?: App.PageState;
 }
 
-export function withQuery(
-	searchParams: URLSearchParams,
-	params: Record<string, unknown>,
-	options: GotoOptions = {}
-) {
+export function withQuery(params: Record<string, unknown>, options: GotoOptions = {}) {
 	if (browser) {
-		const url = new URLSearchParams(searchParams);
+		const url = new URLSearchParams();
 
 		Object.entries(params).forEach(([key, value]) => {
 			url.set(key, `${value}`);

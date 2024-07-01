@@ -1,34 +1,69 @@
 <script lang="ts">
-	import type { Components } from "$lib/backend";
+	import type { Components } from '$lib/backend';
 
-	export let data: Components.Schemas.PageMetadata;
-
-	export let page: number = 1;
+	export let page: number;
+	export let maxPage: number;
 
 	$: isFirst = page <= 1;
-	$: isLast = page >= data.totalPages;
-
-	$: page = Math.max(Math.min(page, data.totalPages ?? 1), 1);
+	$: isLast = page >= maxPage;
 </script>
 
-<div>
-	<button on:click={() => page = page - 1} disabled={isFirst}>Prev</button>
+<div class="page-filter">
+	<button on:click={() => (page = 1)} disabled={isFirst}>First</button>
 
-	<input class="page-input" type="number" bind:value={page} min={1} max={data.totalPages}>
-	<span>/</span>
-	<span>{data.totalPages}</span>
+	<button on:click={() => page--} disabled={isFirst}>Prev</button>
 
-	<button on:click={() => page = page + 1} disabled={isLast}>Next</button>
+	<span class="page-selector">
+		<input type="number" name="page" id="page" bind:value={page} min="1" max={maxPage} />
+		/
+		<span>{maxPage}</span>
+	</span>
+
+	<button on:click={() => page++} disabled={isLast}>Next</button>
+
+	<button on:click={() => (page = maxPage)} disabled={isLast}>Last</button>
 </div>
 
 <style>
-    div {
-        display: inline-block;
-    }
+	.page-filter {
+		display: flex;
+		justify-content: center;
+		color: hsl(0, 0%, 50%);
 
-    .page-input {
-        min-width: 1ch;
-        width: auto;
-		text-align: right;
-    }
+		& button {
+			padding: 5px 10px;
+			border-radius: 5px;
+			border: 1px solid hsl(0, 0%, 80%);
+			background-color: white;
+			color: hsl(0, 0%, 30%);
+			margin: 0 5px;
+
+			&:hover {
+				cursor: pointer;
+				background-color: hsl(0, 0%, 95%);
+			}
+
+			&:disabled {
+				cursor: not-allowed;
+				background-color: hsl(0, 0%, 95%);
+			}
+		}
+
+		& .page-selector {
+			display: flex;
+			gap: 3px;
+			justify-content: center;
+			align-items: center;
+
+			& input {
+				min-width: 1ch;
+				width: 6ch;
+
+				outline: none;
+				border: none;
+				border-bottom: 1px solid hsl(0, 0%, 40%);
+				text-align: right;
+			}
+		}
+	}
 </style>
