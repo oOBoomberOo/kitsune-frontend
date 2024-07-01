@@ -6,8 +6,8 @@
 	$: stopped = data.status === 'COMPLETED';
 </script>
 
-<a href="/video/{data.id}" class:stopped={stopped}>
-	<header class:panic={data.status === 'PANIC'}>
+<a href="/video/{data.id}" class:stopped={stopped} class:panic={data.status === 'PANIC'}>
+	<header>
 		<img src="https://img.youtube.com/vi/{data.id}/maxresdefault.jpg" alt={data.title} />
 
 		<span>{data.title}</span>
@@ -19,6 +19,8 @@
 		color: inherit;
 		text-decoration: none;
         display: block;
+
+		--highlight-color: rgba(0, 0, 0, 0.25);
 	}
 
 	.stopped {
@@ -26,7 +28,7 @@
 	}
 
     .panic {
-        border: 1px solid red;
+		--highlight-color: hsl(0, 77%, 80%) !important;
     }
 
 	header {
@@ -36,8 +38,9 @@
 
 		border-radius: 5px;
 
-		box-shadow: rgba(0, 0, 0, 0.25) 5px 5px 1px;
+		box-shadow: var(--highlight-color) 5px 5px 1px;
 		transition: 0.1s transform;
+		
 
 		&:hover {
 			transform: translateY(-5px);

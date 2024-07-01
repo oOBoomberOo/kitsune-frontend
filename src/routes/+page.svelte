@@ -10,37 +10,76 @@
 	export let data: PageData;
 
 	let page = 1;
-	let pageSize = 10;
+	let pageSize = 100;
 
 	$: maxPage = data.videos.page.totalPages;
 	$: content = data.videos.content;
 	$: withQuery({ page, pageSize });
 </script>
 
-<nav class="pagination">
-	<Paginator bind:page bind:maxPage />
+<nav>
+	<a href="/">Home</a>
 
-	<div>
-		<select bind:value={pageSize} name="pageSize" id="pageSize">
-			<option value={1}>1</option>
-			<option value={10}>10</option>
-			<option value={25}>25</option>
-			<option value={50}>50</option>
-			<option value={100}>100</option>
-			<option value={0x7fffffff}>ALL</option>
-		</select>
+	<span class="separator"></span>
+
+	<div class="pagination">
+		<Paginator bind:page bind:maxPage />
+
+		<div>
+			<select bind:value={pageSize} name="pageSize" id="pageSize">
+				<option value={1}>1</option>
+				<option value={10}>10</option>
+				<option value={25}>25</option>
+				<option value={50}>50</option>
+				<option value={100}>100</option>
+				<option value={0x7fffffff}>ALL</option>
+			</select>
+		</div>
 	</div>
+
+	<span class="separator"></span>
+
+	<a href="/new">Add Video</a>
 </nav>
 
 <div class="container">
-	{#each content as video, index (video.id) }
-		<div animate:flip={{ delay: 250, duration: 250, easing: quintInOut }} transition:fly={{ x: '-100%' }}>
+	{#each content as video, index (video.id)}
+		<div>
 			<VideoPreview data={video} />
 		</div>
 	{/each}
 </div>
 
 <style>
+	nav {
+		position: sticky;
+		top: 0;
+
+		padding: 5px 15px;
+
+		border-radius: 5px;
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+		background: white;
+		z-index: 10;
+
+		display: flex;
+
+		& a {
+			text-decoration: none;
+			color: #000;
+			font-weight: bold;
+		}
+
+		& a:hover {
+			color: #333;
+			text-decoration: underline;
+		}
+
+		& .separator {
+			flex-grow: 1;
+		}
+	}
+
 	.pagination {
 		display: flex;
 		justify-content: center;
