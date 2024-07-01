@@ -114,7 +114,7 @@ export declare namespace Components {
 		}
 		export interface UploadVideoRequest {
 			startAt?: string; // date-time
-			endAt: string; // date-time
+			endAt?: string; // date-time
 		}
 		export interface Video {
 			id?: string;
@@ -255,12 +255,14 @@ declare namespace Paths {
 			export type PageSize = number; // int32
 			export type Search = string;
 			export type SortOrder = 'ASC' | 'DESC';
+			export type Status = ('SCHEDULED' | 'ACTIVE' | 'PANIC' | 'COMPLETED')[];
 		}
 		export interface QueryParameters {
 			search?: Parameters.Search;
 			page?: Parameters.Page /* int32 */;
 			pageSize?: Parameters.PageSize /* int32 */;
 			sortOrder?: Parameters.SortOrder;
+			status?: Parameters.Status;
 		}
 		namespace Responses {
 			export type $200 = Components.Schemas.PageResponseVideoResponse;

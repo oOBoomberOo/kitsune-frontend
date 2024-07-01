@@ -2,9 +2,11 @@
 	import type { Components } from '$lib/backend';
 
 	export let data: Components.Schemas.VideoResponse;
+
+	$: stopped = data.status === 'COMPLETED';
 </script>
 
-<a href="/video/{data.id}">
+<a href="/video/{data.id}" class:stopped={stopped}>
 	<header class:panic={data.status === 'PANIC'}>
 		<img src="https://img.youtube.com/vi/{data.id}/maxresdefault.jpg" alt={data.title} />
 
@@ -17,6 +19,10 @@
 		color: inherit;
 		text-decoration: none;
         display: block;
+	}
+
+	.stopped {
+		filter: grayscale(100%);
 	}
 
     .panic {
